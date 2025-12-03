@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Product } from '../types';
-import { X, ShoppingBag, Send, MessageSquare, Maximize2, Phone } from 'lucide-react';
+import { X, ShoppingBag, Send, MessageSquare, Maximize2, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Lightbox from './Lightbox';
@@ -23,6 +23,7 @@ const ProductOverlay: React.FC<ProductOverlayProps> = ({ product, onClose, onAdd
     const [isChatting, setIsChatting] = useState(false);
     const [showLightbox, setShowLightbox] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     // Checkout State
     const [view, setView] = useState<'DETAILS' | 'CHECKOUT'>('DETAILS');
@@ -112,12 +113,12 @@ const ProductOverlay: React.FC<ProductOverlayProps> = ({ product, onClose, onAdd
                                 <div
                                     className="w-full h-full relative cursor-zoom-in group"
                                     onClick={() => {
-                                        setLightboxIndex(0);
+                                        setLightboxIndex(currentImageIndex);
                                         setShowLightbox(true);
                                     }}
                                 >
                                     <img
-                                        src={product.images[0]}
+                                        src={product.images[currentImageIndex]}
                                         alt={product.name}
                                         className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700"
                                     />
@@ -129,6 +130,39 @@ const ProductOverlay: React.FC<ProductOverlayProps> = ({ product, onClose, onAdd
                                             <span className="text-xs font-mono uppercase">Expand</span>
                                         </div>
                                     </div>
+
+                                    {/* Navigation Arrows - Always visible on mobile, hover on desktop */}
+                                    {product.images.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setCurrentImageIndex((prev) =>
+                                                        prev === 0 ? product.images.length - 1 : prev - 1
+                                                    );
+                                                }}
+                                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 hover:bg-[#ccff00] hover:text-black text-white p-2 md:p-3 rounded-full border border-white/20 hover:border-[#ccff00] transition-all z-10 md:opacity-0 md:group-hover:opacity-100"
+                                            >
+                                                <ChevronLeft size={20} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setCurrentImageIndex((prev) =>
+                                                        prev === product.images.length - 1 ? 0 : prev + 1
+                                                    );
+                                                }}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 hover:bg-[#ccff00] hover:text-black text-white p-2 md:p-3 rounded-full border border-white/20 hover:border-[#ccff00] transition-all z-10 md:opacity-0 md:group-hover:opacity-100"
+                                            >
+                                                <ChevronRight size={20} />
+                                            </button>
+
+                                            {/* Image Counter */}
+                                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/80 px-3 py-1 rounded-full border border-white/20 text-xs font-mono z-10">
+                                                {currentImageIndex + 1} / {product.images.length}
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
